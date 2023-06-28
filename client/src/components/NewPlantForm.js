@@ -1,25 +1,32 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 function NewPlantForm({ onAddPlant }) {
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
   const [price, setPrice] = useState("");
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  function handleSubmit(event) {
+    event.preventDefault();
+    const newPlant = {
+      name: name,
+      image: image,
+      price: parseFloat(price),
+    };
+
     fetch("/plants", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        name: name,
-        image: image,
-        price: price,
-      }),
+      body: JSON.stringify(newPlant),
     })
-      .then((r) => r.json())
-      .then((newPlant) => onAddPlant(newPlant));
+      .then((response) => response.json())
+      .then((data) => {
+        onAddPlant(data);
+        setName("");
+        setImage("");
+        setPrice("");
+      });
   }
 
   return (
@@ -31,14 +38,14 @@ function NewPlantForm({ onAddPlant }) {
           name="name"
           placeholder="Plant name"
           value={name}
-          onChange={(e) => setName(e.target.value)}
+          onChange={(event) => setName(event.target.value)}
         />
         <input
           type="text"
           name="image"
           placeholder="Image URL"
           value={image}
-          onChange={(e) => setImage(e.target.value)}
+          onChange={(event) => setImage(event.target.value)}
         />
         <input
           type="number"
@@ -46,7 +53,7 @@ function NewPlantForm({ onAddPlant }) {
           step="0.01"
           placeholder="Price"
           value={price}
-          onChange={(e) => setPrice(parseFloat(e.target.value))}
+          onChange={(event) => setPrice(event.target.value)}
         />
         <button type="submit">Add Plant</button>
       </form>
